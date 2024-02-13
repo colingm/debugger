@@ -1,4 +1,136 @@
-<link rel="stylesheet" href="style.css" />
-<iframe src="./catalog/index.html" id="catalog"></iframe>
-<iframe src="./cart/index.html" id="cart"></iframe>
-<script src="script.js"></script>
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body {
+                padding: 0;
+                margin: 0;
+                font-family: 'Helvetica';
+                font-size: 12px;
+                font-weight: 400;
+                letter-spacing: 0;
+            }
+
+            #nav {
+                list-style: none;
+                padding: 20px;
+                margin: 0;
+                background: #666;
+            }
+
+            #nav li {
+                display: inline-block;
+            }
+
+            #nav li a {
+                font-size: 16px;
+                color: white;
+                text-decoration: none;
+                padding: 10px;
+            }
+
+            #nav li a.visitor.active {
+                outline: 1px solid white;
+            }
+
+            #nav li a:hover {
+                text-decoration: underline;
+            }
+
+            #content ul {
+                list-style: none;
+                padding: 20px;
+                margin: 0;
+            }
+
+            #content li {
+                display: inline-block;
+            }
+
+            button {
+                padding: 8px 16px;
+                border-radius: 4px;
+                font-size: 16px;
+                margin-right: 20px;
+            }
+
+            .framecontainer {
+                padding: 20px;
+            }
+
+            iframe {
+                width: 100%;
+                height: 500px;
+                border: 2px solid #ec2059;
+            }
+        </style>
+    </head>
+    <body>
+        <ul id="nav">
+            <li><a class="visitor" href="javascript:void(0)">visitor one</a></li>
+            <li><a class="visitor" href="javascript:void(0)">visitor two</a></li>
+            <li><a href="index.html">location 1</a></li>
+            <li><a href="?foo">location 2</a></li>
+            <li><a href="#foo">hash 1</a></li>
+            <li><a href="#">hash 2</a></li>
+        </ul>
+        <div id="content">
+            <ul>
+                <li><button id="addframe" type="button">Add a Frame</button></li>
+                <li><button id="one" type="button">One</button></li>
+                <li><button id="two" type="button">Two</button></li>
+                <li><button id="three" type="button">Three</button></li>
+                <li><button id="debugger" type="button" onclick="pendo.enableDebugging(false, 2)">Debugger</button></li>
+            </ul>
+        </div>
+        <script src="setupPendo.js"></script>
+        <script>
+            if (window != window.top) {
+                document.body.classList.add('frame');
+            }
+
+            var frameNumber = /\?frame=(\d+)/.exec(location.search);
+            if (frameNumber && frameNumber.length > 1) {
+                document.body.classList.add('frame' + frameNumber[1]);
+            } else {
+                document.body.classList.add('top-frame');
+            }
+
+            document.getElementById('addframe').addEventListener('click', function () {
+                var frameNumber = document.getElementsByClassName('framecontainer').length + 1;
+                var connector = location.href.indexOf('?') > -1 ? '&' : '?';
+                var src = location.href + connector + 'frame=' + frameNumber;
+                var div = document.createElement('div');
+                div.className = 'framecontainer';
+                div.innerHTML = '<iframe id="frame' + frameNumber + '" src="' + src + '"></iframe>';
+                document.body.appendChild(div);
+            });
+
+            function changeVisitor (e) {
+                visitorButtons.forEach(function (button) {
+                    button.classList.remove('active');
+                });
+                e.target.classList.add('active');
+                window.wdio.options.visitor.id = e.target.id;
+                localStorage.wdio = JSON.stringify(window.wdio);
+                pendo.identify({
+                    visitor: {
+                        id: e.target.id
+                    },
+                    account: {
+                        id: 'test'
+                    }
+                });
+            }
+
+            var visitorButtons = [].slice.call(document.getElementsByClassName('visitor'));
+            visitorButtons.forEach(function (button, i) {
+                button.id = window.wdio.options.visitor.idList[i];
+                if (button.id === window.wdio.options.visitor.id) {
+                    button.classList.add('active');
+                }
+                button.addEventListener('click', changeVisitor);
+            });
+        </script>
+    </body>
+</html>
