@@ -10,7 +10,11 @@
             apiKey,
             visitor: {
                 id: 'wdio@pendo.io',
-                idList: ['wdio@pendo.io', 'wdio2@pendo.io']
+                idList: ['wdio@pendo.io', 'wdio2@pendo.io'],
+                department: 'Engineering',
+                Department: 'R&D',
+                role: 'Manager',
+                location: 'Raleigh'
             },
             account: {
                 id: 'test',
