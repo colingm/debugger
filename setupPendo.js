@@ -5,11 +5,15 @@
         }
     }, true);
 
+    var params = new Proxy(new URLSearchParams(window.location.search), {
+        get: (searchParams, prop) => searchParams.get(prop)
+    });
+
     var wdio = {
         options: {
-            apiKey,
+            apiKey: params.key || apiKey,
             visitor: {
-                id: 'wdio@pendo.io',
+                id: params.visitor || 'wdio@pendo.io',
                 idList: ['wdio@pendo.io', 'wdio2@pendo.io'],
                 department: 'Engineering',
                 Department: 'R&D',
@@ -17,7 +21,7 @@
                 location: 'Raleigh'
             },
             account: {
-                id: 'test',
+                id: params.account || 'test',
                 idList: ['test', 'test2']
             }
         }
@@ -26,9 +30,6 @@
     window.wdio = wdio;
     window.PendoConfig = wdio.config;
 
-    var params = new Proxy(new URLSearchParams(window.location.search), {
-        get: (searchParams, prop) => searchParams.get(prop)
-    });
     if (params['top_only'] && window !== window.top) {
         return;
     }
